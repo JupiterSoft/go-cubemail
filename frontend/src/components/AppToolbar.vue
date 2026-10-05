@@ -32,9 +32,12 @@ const moveFolders = computed(() =>
 /**
  * Refreshes the currently viewed mailbox folder list and updates quota information.
  */
-function refresh() {
-  mail.fetchFolderMessages(mail.folder)
-  auth.fetchQuota()
+async function refresh() {
+  await Promise.all([
+    mail.fetchFolderMessages(mail.folder),
+    mail.reloadFolders(),
+    auth.fetchQuota(),
+  ])
 }
 
 /** Toggles expansion state of the Move to dropdown */

@@ -89,6 +89,14 @@ export interface Folder {
   name?: string
   /** True if this is a custom folder created by the user */
   custom?: boolean
+  /** Full IMAP name of the parent folder */
+  parentName?: string
+  /** True if the folder has child folders */
+  hasChildren?: boolean
+  /** Nesting depth, 0 = top level */
+  depth?: number
+  /** Backend-computed indentation */
+  paddingLeft?: number
 }
 
 /**

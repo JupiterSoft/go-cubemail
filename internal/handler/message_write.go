@@ -25,7 +25,7 @@ import (
 // @Security     CookieAuth
 // @Router       /mail/{mailbox}/{uid}/flag [post]
 func (h *MessageHandler) Flag(c *echo.Context) error {
-	mailbox := c.Param("mailbox")
+	mailbox := decodePathParam(c.Param("mailbox"))
 	uid, err := strconv.ParseUint(c.Param("uid"), 10, 32)
 	if err != nil {
 		return echo.ErrBadRequest
@@ -76,7 +76,7 @@ func (h *MessageHandler) Flag(c *echo.Context) error {
 // @Security     CookieAuth
 // @Router       /mail/{mailbox}/{uid}/move [post]
 func (h *MessageHandler) Move(c *echo.Context) error {
-	mailbox := c.Param("mailbox")
+	mailbox := decodePathParam(c.Param("mailbox"))
 	uid, err := strconv.ParseUint(c.Param("uid"), 10, 32)
 	if err != nil {
 		return echo.ErrBadRequest
@@ -111,7 +111,7 @@ func (h *MessageHandler) Move(c *echo.Context) error {
 // @Security     CookieAuth
 // @Router       /mail/{mailbox}/{uid} [delete]
 func (h *MessageHandler) Delete(c *echo.Context) error {
-	mailbox := c.Param("mailbox")
+	mailbox := decodePathParam(c.Param("mailbox"))
 	uid, err := strconv.ParseUint(c.Param("uid"), 10, 32)
 	if err != nil {
 		return echo.ErrBadRequest
@@ -151,7 +151,7 @@ func (h *MessageHandler) Delete(c *echo.Context) error {
 // @Security     CookieAuth
 // @Router       /mail/{mailbox} [delete]
 func (h *MessageHandler) EmptyTrash(c *echo.Context) error {
-	mailbox := c.Param("mailbox")
+	mailbox := decodePathParam(c.Param("mailbox"))
 	s := c.Get("imap_session").(*session.IMAPSession)
 	conn, err := h.imapConn(s)
 	if err != nil {

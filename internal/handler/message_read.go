@@ -27,7 +27,7 @@ import (
 // @Security     CookieAuth
 // @Router       /mail/{mailbox}/{uid} [get]
 func (h *MessageHandler) Read(c *echo.Context) error {
-	mailbox := c.Param("mailbox")
+	mailbox := decodePathParam(c.Param("mailbox"))
 	uid, err := strconv.ParseUint(c.Param("uid"), 10, 32)
 	if err != nil {
 		return echo.ErrBadRequest
@@ -151,7 +151,7 @@ func (h *MessageHandler) Read(c *echo.Context) error {
 // @Security     CookieAuth
 // @Router       /mail/{mailbox}/{uid}/download [get]
 func (h *MessageHandler) Download(c *echo.Context) error {
-	mailbox := c.Param("mailbox")
+	mailbox := decodePathParam(c.Param("mailbox"))
 	uid, err := strconv.ParseUint(c.Param("uid"), 10, 32)
 	if err != nil {
 		return echo.ErrBadRequest
@@ -195,7 +195,7 @@ func (h *MessageHandler) Download(c *echo.Context) error {
 // @Security     CookieAuth
 // @Router       /mail/{mailbox}/{uid}/raw [get]
 func (h *MessageHandler) Raw(c *echo.Context) error {
-	mailbox := c.Param("mailbox")
+	mailbox := decodePathParam(c.Param("mailbox"))
 	uid, err := strconv.ParseUint(c.Param("uid"), 10, 32)
 	if err != nil {
 		return echo.ErrBadRequest
@@ -234,7 +234,7 @@ func (h *MessageHandler) Raw(c *echo.Context) error {
 // @Security     CookieAuth
 // @Router       /mail/{mailbox}/{uid}/attachment/{part} [get]
 func (h *MessageHandler) Attachment(c *echo.Context) error {
-	mailbox := c.Param("mailbox")
+	mailbox := decodePathParam(c.Param("mailbox"))
 	uid, err := strconv.ParseUint(c.Param("uid"), 10, 32)
 	if err != nil {
 		return echo.ErrBadRequest

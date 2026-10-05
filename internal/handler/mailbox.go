@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -73,7 +74,7 @@ func (h *MailboxHandler) resolveCreateDelimiter(conn *imap.Client, parent, reque
 // @Security     CookieAuth
 // @Router       /mail/{mailbox} [get]
 func (h *MailboxHandler) List(c *echo.Context) error {
-	mailbox := c.Param("mailbox")
+	mailbox := decodePathParam(c.Param("mailbox"))
 	s := c.Get("imap_session").(*session.IMAPSession)
 
 	conn, err := h.imapConn(s)
@@ -82,46 +83,78 @@ func (h *MailboxHandler) List(c *echo.Context) error {
 	}
 	defer conn.Close()
 
-	if err := conn.SelectMailbox(mailbox); err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "Mailbox not found"})
-	}
-
-	uids, err := conn.Search(&imap.SearchCriteria{})
+	selected, err := conn.SelectMailboxData(mailbox)
 	if err != nil {
-		return err
-	}
-
-	// Reverse UIDs so newest messages appear first.
-	for i, j := 0, len(uids)-1; i < j; i, j = i+1, j-1 {
-		uids[i], uids[j] = uids[j], uids[i]
+		log.Printf("SelectMailbox failed: mailbox=%q error=%v", mailbox, err)
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Mailbox not found"})
 	}
 
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	if page < 1 {
 		page = 1
 	}
+
 	perPage := h.cfg.UI.RowsPerPage
-	start := (page - 1) * perPage
-	end := start + perPage
-	if start > len(uids) {
-		start = len(uids)
-	}
-	if end > len(uids) {
-		end = len(uids)
+	total := int(selected.NumMessages)
+	offset := (page - 1) * perPage
+
+	// Page is past the end of the mailbox.
+	if offset >= total {
+		return c.JSON(http.StatusOK, map[string]any{
+			"mailbox":  mailbox,
+			"messages": []imap.Envelope{},
+			"page":     page,
+			"total":    total,
+			"username": s.Username,
+		})
 	}
 
-	fetched, err := conn.FetchEnvelopes(uids[start:end])
+	// IMAP sequence numbers start at 1.
+	// Page 1 means the newest N messages.
+	endSeq := total - offset
+	startSeq := endSeq - perPage + 1
+	if startSeq < 1 {
+		startSeq = 1
+	}
+
+	// Fetch only UIDs for the requested sequence range.
+	seqSet := goimap.SeqSet{
+		goimap.SeqRange{
+			Start: uint32(startSeq),
+			Stop:  uint32(endSeq),
+		},
+	}
+
+	uidMsgs, err := conn.Client.Fetch(seqSet, &goimap.FetchOptions{
+		UID: true,
+	}).Collect()
 	if err != nil {
 		return err
 	}
 
-	// Rebuild in the original reversed order since FetchEnvelopes may reorder results.
-	envMap := make(map[goimap.UID]imap.Envelope)
+	// Server returns sequence order oldest -> newest.
+	// UI needs newest -> oldest.
+	uids := make([]goimap.UID, 0, len(uidMsgs))
+	for i := len(uidMsgs) - 1; i >= 0; i-- {
+		if uidMsgs[i].UID != 0 {
+			uids = append(uids, uidMsgs[i].UID)
+		}
+	}
+
+	// Now fetch envelopes only for these <= 50 UIDs.
+	fetched, err := conn.FetchEnvelopes(uids)
+	if err != nil {
+		return err
+	}
+
+	// Preserve newest -> oldest ordering.
+	envMap := make(map[goimap.UID]imap.Envelope, len(fetched))
 	for _, e := range fetched {
 		envMap[e.UID] = e
 	}
-	envelopes := make([]imap.Envelope, 0, len(uids[start:end]))
-	for _, uid := range uids[start:end] {
+
+	envelopes := make([]imap.Envelope, 0, len(uids))
+	for _, uid := range uids {
 		if e, ok := envMap[uid]; ok {
 			envelopes = append(envelopes, e)
 		}
@@ -131,7 +164,7 @@ func (h *MailboxHandler) List(c *echo.Context) error {
 		"mailbox":  mailbox,
 		"messages": envelopes,
 		"page":     page,
-		"total":    len(uids),
+		"total":    total,
 		"username": s.Username,
 	})
 }
@@ -156,6 +189,11 @@ func (h *MailboxHandler) FoldersJSON(c *echo.Context) error {
 	if err != nil {
 		return err
 	}
+
+	if c.QueryParam("counts") == "1" {
+		conn.FillMailboxCounts(folders)
+	}
+
 	return c.JSON(http.StatusOK, folders)
 }
 

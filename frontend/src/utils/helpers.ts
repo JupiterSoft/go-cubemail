@@ -28,22 +28,32 @@ export function parseMailDate(s: string): number {
 
 export function formatDate(raw: string, goFmt?: string): string {
   if (!raw) return ''
-  let d = new Date(raw)
+  const mailTs = parseMailDate(raw)
+  let d = mailTs ? new Date(mailTs) : new Date(raw)
   if (isNaN(d.getTime())) d = new Date(raw.replace(/^[A-Za-z]{3},\s*/, ''))
   if (isNaN(d.getTime())) d = new Date(raw.replace(' ', 'T'))
   if (isNaN(d.getTime())) return raw
 
-  const fmt = goFmt || '02/01/2006 15:04'
+  const fmt = goFmt || '02.01.2006 15:04'
   const pad = (n: number) => String(n).padStart(2, '0')
 
-  return fmt
-    .replace('2006', String(d.getFullYear()))
-    .replace('06',   String(d.getFullYear()).slice(-2))
-    .replace('01',   pad(d.getMonth() + 1))
-    .replace('02',   pad(d.getDate()))
-    .replace('15',   pad(d.getHours()))
-    .replace('04',   pad(d.getMinutes()))
-    .replace('05',   pad(d.getSeconds()))
+  let out = fmt
+    .split('2006').join('{YEAR4}')
+    .split('06').join('{YEAR2}')
+    .split('01').join('{MONTH}')
+    .split('02').join('{DAY}')
+    .split('15').join('{HOUR}')
+    .split('04').join('{MINUTE}')
+    .split('05').join('{SECOND}')
+
+  return out
+    .split('{YEAR4}').join(String(d.getFullYear()))
+    .split('{YEAR2}').join(String(d.getFullYear()).slice(-2))
+    .split('{MONTH}').join(pad(d.getMonth() + 1))
+    .split('{DAY}').join(pad(d.getDate()))
+    .split('{HOUR}').join(pad(d.getHours()))
+    .split('{MINUTE}').join(pad(d.getMinutes()))
+    .split('{SECOND}').join(pad(d.getSeconds()))
 }
 
 /**

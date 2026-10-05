@@ -9,9 +9,10 @@ import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
+  base: '/webmail/',
   plugins: [vue(), tailwindcss()],
   define: {
-    API_BASE: JSON.stringify('/api/v1'),
+    API_BASE: JSON.stringify('/webmail/api/v1'),
   },
   server: {
     port: 5173,

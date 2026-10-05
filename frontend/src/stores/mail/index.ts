@@ -281,7 +281,7 @@ export const useMailStore = defineStore('mail', () => {
     if (!msg) return
     const ics = msg.attachments?.find(a => a.content_type === 'text/calendar' || a.name?.endsWith('.ics'))
     if (ics) {
-      window.open(`/api/v1/mail/${encodeURIComponent(msg.folder)}/${msg.id}/attachment/${ics.part}`, '_blank')
+      window.open(`/webmail/api/v1/mail/${encodeURIComponent(msg.folder)}/${msg.id}/attachment/${ics.part}`, '_blank')
     } else {
       toast.info('No calendar file found in this message.')
     }

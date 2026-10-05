@@ -6,7 +6,7 @@
  * and visualizes the active user's storage quota progress bar.
  */
 
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useMailStore } from '../stores/mail'
 import FolderRow from './FolderRow.vue'
@@ -16,6 +16,68 @@ import Icon from './Icon.vue'
 const auth = useAuthStore()
 /** Mail store instance */
 const mail = useMailStore()
+
+const STORAGE_KEY = 'cubemail-expanded-folders'
+const savedExpanded = localStorage.getItem(STORAGE_KEY)
+
+const expandedFolders = ref<Set<string>>(
+  savedExpanded
+    ? new Set(JSON.parse(savedExpanded))
+    : new Set()
+)
+
+const initializedTree = ref(false)
+
+watch(
+  () => mail.folders,
+  (folders) => {
+    // First run: keep the current behaviour visually, but as a real tree.
+    // All folders with children start expanded.
+    if (!initializedTree.value && folders.length) {
+      if (!savedExpanded) {
+        expandedFolders.value = new Set(
+          folders
+            .filter(f => f.hasChildren && f.name)
+            .map(f => f.name as string)
+        )
+      }
+      initializedTree.value = true
+    }
+  },
+  { deep: true, immediate: true }
+)
+
+function toggleFolder(name?: string) {
+  if (!name) return
+
+  const next = new Set(expandedFolders.value)
+  next.has(name) ? next.delete(name) : next.add(name)
+
+  expandedFolders.value = next
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...next]))
+}
+
+const visibleFolders = computed(() => {
+  const byName = new Map(
+    mail.folders
+      .filter(f => f.name)
+      .map(f => [f.name as string, f])
+  )
+
+  return mail.folders.filter(f => {
+    let parentName = f.parentName
+
+    while (parentName) {
+      if (!expandedFolders.value.has(parentName))
+        return false
+
+      const parent = byName.get(parentName)
+      parentName = parent?.parentName
+    }
+
+    return true
+  })
+})
 
 /**
  * Formats a raw number of bytes to a human-readable size string (MB or GB).
@@ -56,10 +118,12 @@ const quotaPercent    = computed(() => {
     <!-- Folder list -->
     <div class="flex-1 overflow-auto scroll-y py-1.5">
       <FolderRow
-        v-for="f in mail.folders"
+        v-for="f in visibleFolders"
         :key="f.id"
         :folder="f"
         :active="mail.folder === f.id"
+        :expanded="expandedFolders.has(f.name || '')"
+        @toggle="toggleFolder(f.name)"
         @click="mail.setFolder(f.id)"
         @menu="(action, fl) => mail.onFolderMenu(action, fl)"
         @drop-mail="(ids, folderId) => mail.moveMail(folderId, ids)"

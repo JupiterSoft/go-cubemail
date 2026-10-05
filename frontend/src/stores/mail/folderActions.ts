@@ -53,12 +53,22 @@ export function useFolderActions({ auth, dialog, folders, mails, folder, view, s
    */
   async function reloadFolders(): Promise<void> {
     if (!auth.isApiOnline) return
-    const res = await axios.get(`${API_BASE}/folders`)
+    const res = await axios.get(`${API_BASE}/folders?counts=1`)
     folders.value = res.data.map((f: Record<string, unknown>) => {
       const id     = FOLDER_ID_MAP[String(f.Name)] || String(f.Name).toLowerCase().replace(/\s+/g, '-')
       const unread = Number(f.Unseen)   || 0
       const total  = Number(f.Messages) || 0
-      return { id, label: f.DisplayName || f.Name, name: f.Name, count: unread > 0 ? `${unread}/${total}` : String(total), custom: !f.IsSystem }
+      return {
+          id,
+          label: String(f.DisplayName || f.Name),
+          name: String(f.Name),
+          count: unread > 0 ? String(unread) : '',
+          custom: !f.IsSystem,
+          parentName: String(f.ParentName || ''),
+          hasChildren: Boolean(f.HasChildren),
+          depth: Number(f.Depth) || 0,
+          paddingLeft: Number(f.PaddingLeft) || 20,
+        }
     })
   }
 

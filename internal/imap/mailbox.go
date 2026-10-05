@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/emersion/go-imap/v2"
+	"github.com/emersion/go-imap/v2/imapclient"
 )
 
 // MailboxInfo describes a single IMAP folder including tree-structure metadata
@@ -28,9 +29,7 @@ type MailboxInfo struct {
 // ListMailboxes returns all IMAP folders with unseen/message counts and tree metadata.
 // Folders are sorted in standard email order: INBOX → Drafts → Sent → Trash → Junk → others.
 func (c *Client) ListMailboxes() ([]MailboxInfo, error) {
-	listCmd := c.Client.List("", "*", &imap.ListOptions{
-		ReturnStatus: &imap.StatusOptions{NumUnseen: true, NumMessages: true},
-	})
+	listCmd := c.Client.List("", "*", nil)
 	data, err := listCmd.Collect()
 	if err != nil {
 		return nil, err
@@ -148,6 +147,46 @@ func (c *Client) ListMailboxes() ([]MailboxInfo, error) {
 	return result, nil
 }
 
+// FillMailboxCounts fetches total and unseen counts using standard STATUS.
+// This is compatible with IMAP servers such as Yandex which do not support LIST-STATUS.
+func (c *Client) FillMailboxCounts(folders []MailboxInfo) {
+	type pendingStatus struct {
+		index int
+		cmd   *imapclient.StatusCommand
+	}
+
+	pending := make([]pendingStatus, 0, len(folders))
+
+	// Queue all STATUS commands first.
+	// go-imap will pipeline them on the same IMAP connection.
+	for i := range folders {
+		if folders[i].NoSelect {
+			continue
+		}
+
+		cmd := c.Client.Status(folders[i].Name, &imap.StatusOptions{
+			NumUnseen: true,
+		})
+
+		pending = append(pending, pendingStatus{
+			index: i,
+			cmd:   cmd,
+		})
+	}
+
+	// Then collect the replies.
+	for _, p := range pending {
+		data, err := p.cmd.Wait()
+		if err != nil {
+			continue
+		}
+
+		if data.NumUnseen != nil {
+			folders[p.index].Unseen = *data.NumUnseen
+		}
+	}
+}
+
 // UnreadCount returns the number of unseen messages in the given mailbox.
 func (c *Client) UnreadCount(mailbox string) (uint32, error) {
 	data, err := c.Client.Status(mailbox, &imap.StatusOptions{NumUnseen: true}).Wait()
@@ -182,8 +221,12 @@ func (c *Client) FetchAllUIDs() ([]imap.UID, error) {
 }
 
 // SelectMailbox issues an IMAP SELECT command so subsequent operations target the named folder.
+func (c *Client) SelectMailboxData(mailbox string) (*imap.SelectData, error) {
+	return c.Client.Select(mailbox, nil).Wait()
+}
+
 func (c *Client) SelectMailbox(mailbox string) error {
-	_, err := c.Client.Select(mailbox, nil).Wait()
+	_, err := c.SelectMailboxData(mailbox)
 	return err
 }
 

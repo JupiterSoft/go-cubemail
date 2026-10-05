@@ -89,12 +89,6 @@ export function useMailApi({ auth, folders, mails, folder, selectedId }: MailApi
           await fetchMessageBody(sel.id)
       }
 
-      const folderObj = folders.value.find(f => f.id === folderId)
-      if (folderObj) {
-        const total  = mailRes.data.total ?? fetched.length
-        const unread = fetched.filter(m => m.unread).length
-        folderObj.count = unread > 0 ? `${unread}/${total}` : String(total)
-      }
       return true
     } catch (e) {
       console.error('fetchFolderMessages failed', e)
@@ -118,8 +112,44 @@ export function useMailApi({ auth, folders, mails, folder, selectedId }: MailApi
         const id     = FOLDER_ID_MAP[String(f.Name)] || String(f.Name).toLowerCase().replace(/\s+/g, '-')
         const unread = Number(f.Unseen)   || 0
         const total  = Number(f.Messages) || 0
-        return { id, label: f.DisplayName || f.Name, name: f.Name, count: unread > 0 ? `${unread}/${total}` : String(total), custom: !f.IsSystem }
+        return {
+          id,
+          label: String(f.DisplayName || f.Name),
+          name: String(f.Name),
+          count: unread > 0 ? `${unread}/${total}` : String(total),
+          custom: !f.IsSystem,
+          parentName: String(f.ParentName || ''),
+          hasChildren: Boolean(f.HasChildren),
+          depth: Number(f.Depth) || 0,
+          paddingLeft: Number(f.PaddingLeft) || 20,
+        }
       })
+
+      // Fetch unread counters for all folders in background.
+      // Do not block initial mailbox loading.
+      void axios.get(`${API_BASE}/folders?counts=1`)
+        .then((countsRes) => {
+          const countsByName = new Map<string, Record<string, unknown>>()
+
+          for (const f of countsRes.data) {
+            countsByName.set(String(f.Name), f)
+          }
+
+          folders.value = folders.value.map((folderDef) => {
+            const f = countsByName.get(String(folderDef.name || ''))
+            if (!f) return folderDef
+
+            const unread = Number(f.Unseen) || 0
+
+            return {
+              ...folderDef,
+              count: unread > 0 ? String(unread) : '',
+            }
+          })
+        })
+        .catch((e) => {
+          console.warn('Background folder counters failed', e)
+        })
 
       await fetchFolderMessages(folder.value)
     } catch (e) {

@@ -41,7 +41,7 @@ async function onFileSelected(e: Event) {
  * Redirects user window directly to contacts export downloadable API link.
  */
 function exportContacts() {
-  window.location.href = '/api/v1/contacts/export'
+  window.location.href = '/webmail/api/v1/contacts/export'
 }
 </script>
 

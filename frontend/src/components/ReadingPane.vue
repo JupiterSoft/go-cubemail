@@ -219,7 +219,7 @@ const srcdoc = computed(() => {
         <a
           v-for="(a, i) in m.attachments"
           :key="i"
-          :href="`/api/v1/mail/${m.folder}/${m.id}/attachment/${a.part ?? i}`"
+          :href="`/webmail/api/v1/mail/${m.folder}/${m.id}/attachment/${a.part ?? i}`"
           target="_blank"
           class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-white border border-line text-[11px] text-ink no-underline hover:border-accent-2 hover:bg-accent-soft"
         >

@@ -17,6 +17,8 @@ const props = defineProps<{
   folder: Folder
   /** True if this folder is currently active/rendered */
   active?: boolean
+  /** True when child folders are expanded */
+  expanded?: boolean
 }>()
 
 /** Emitted event triggers */
@@ -27,6 +29,8 @@ const emit = defineEmits<{
   menu: [action: string, folder: Folder]
   /** Emitted when mails are dropped on this folder */
   'drop-mail': [ids: string[], folderId: string]
+  /** Expand/collapse folder tree */
+  toggle: []
 }>()
 
 /** Maps folder IDs to specific Lucide icons */
@@ -133,15 +137,26 @@ const iconName = computed(() => FOLDER_ICON_MAP[props.folder.id] || 'folder')
 <template>
   <div ref="rootEl"
        :class="['side-item', { active, 'menu-open': menu, 'drag-over': isDragOver }]"
+       :style="{ paddingLeft: ((folder.depth || 0) * 16 + 8) + 'px' }"
        @click="$emit('click')"
        @dragover="onDragOver"
        @dragenter.prevent="onDragEnter"
        @dragleave="onDragLeave"
        @dragend="onDragLeave"
        @drop="onDrop">
+    <button
+      v-if="folder.hasChildren"
+      type="button"
+      class="w-4 h-4 flex items-center justify-center flex-shrink-0 text-ink-sub"
+      :title="expanded ? 'Collapse' : 'Expand'"
+      @click.stop="$emit('toggle')"
+    >
+      <span class="text-[10px]">{{ expanded ? '▼' : '▶' }}</span>
+    </button>
+    <span v-else class="w-4 flex-shrink-0"></span>
     <Icon :name="iconName" :size="14" class="text-accent-2" />
-    <span class="lbl">{{ folder.label }}</span>
-    <span class="count">{{ folder.count }}</span>
+    <span :class="['lbl', { 'font-semibold': !!folder.count }]">{{ folder.label }}</span>
+    <span v-if="folder.count" class="count font-semibold">{{ folder.count }}</span>
     <button class="kebab" type="button" title="Folder options" @click.stop="menu = !menu">
       <Icon name="more-vertical" :size="14" />
     </button>
