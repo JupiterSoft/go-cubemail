@@ -35,7 +35,11 @@ export function startNewMailPolling(mail: MailStore, auth: AuthStore): void {
   stopNewMailPolling()
   pollTimer = setInterval(async () => {
     if (!auth.isAuthenticated) return
-    const hasNew = await mail.fetchFolderMessages('inbox', true)
+    const [hasNew] = await Promise.all([
+      mail.fetchFolderMessages('inbox', true),
+      mail.reloadFolders(),
+    ])
+
     if (hasNew) {
       playNotificationSound()
     }

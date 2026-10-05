@@ -189,10 +189,12 @@ export const useMailStore = defineStore('mail', () => {
         m.unread = false
         const f = folders.value.find(x => x.id === m.folder)
         if (f) {
-          const parts  = String(f.count).split('/')
-          const total  = parts.length > 1 ? parseInt(parts[1]) : parseInt(parts[0])
-          const unread = Math.max(0, (parts.length > 1 ? parseInt(parts[0]) : 0) - 1)
-          f.count = unread > 0 ? `${unread}/${total}` : String(total)
+          const current = Number.parseInt(String(f.count || '0'), 10)
+          const unread = Math.max(
+            0,
+            (Number.isFinite(current) ? current : 0) - 1
+          )
+          f.count = unread > 0 ? String(unread) : ''
         }
       }
     }, 400)
