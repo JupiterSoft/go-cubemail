@@ -289,7 +289,7 @@ function backdrop(e) {
           />
           <div
             v-if="showSuggestions && suggestions.length"
-            class="absolute left-0 z-50 bg-white border border-line shadow-md py-1 w-full"
+            class="absolute left-0 z-50 bg-panel border border-line shadow-md py-1 w-full"
             style="top:100%"
           >
             <button
@@ -335,7 +335,7 @@ function backdrop(e) {
           <div
             v-for="(f, i) in attachments"
             :key="i"
-            class="inline-flex items-center gap-1.5 px-2 py-1 bg-white border border-line text-[11.5px] text-ink"
+            class="inline-flex items-center gap-1.5 px-2 py-1 bg-panel border border-line text-[11.5px] text-ink"
           >
             <Icon :name="extIcon(fileExt(f.name))" :size="12" :class="extColor(fileExt(f.name))" />
             <span class="font-medium max-w-[80px] overflow-hidden text-ellipsis whitespace-nowrap">{{ f.name }}</span>

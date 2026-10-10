@@ -46,7 +46,7 @@ function exportContacts() {
 </script>
 
 <template>
-  <div class="bg-white overflow-auto flex flex-col scroll-y">
+  <div class="bg-panel overflow-auto flex flex-col scroll-y">
     <!-- Header -->
     <div class="h-10 px-3 bg-panel-2 border-b border-line flex items-center gap-3 flex-shrink-0">
       <h2 class="m-0 text-[15px] text-accent-bar font-bold">Contacts</h2>
@@ -67,11 +67,11 @@ function exportContacts() {
     </div>
 
     <!-- Contact grid -->
-    <div class="grid bg-white border-t border-l border-line" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr));align-content:start">
+    <div class="grid bg-panel border-t border-l border-line" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr));align-content:start">
       <div
         v-for="c in mail.contacts"
         :key="c.email"
-        class="group relative bg-white py-3 px-3.5 flex gap-3 items-start hover:bg-[#F5F7FA] border-b border-r border-line"
+        class="group relative bg-panel py-3 px-3.5 flex gap-3 items-start hover:bg-[#F5F7FA] border-b border-r border-line"
       >
         <!-- Edit button (appears on hover) -->
         <button

@@ -178,7 +178,7 @@ function onInputKey(e: KeyboardEvent) {
   height: 30px;
   padding: 0 8px;
   border: 1px solid var(--color-line);
-  background: white;
+  background: var(--color-panel);
   font-size: 13px;
   color: var(--color-ink);
   outline: none;
@@ -204,7 +204,7 @@ function onInputKey(e: KeyboardEvent) {
   font-weight: 600;
   cursor: pointer;
   border: 1px solid var(--color-line);
-  background: white;
+  background: var(--color-panel);
   color: var(--color-ink);
 }
 .dlg-btn:hover {
@@ -219,6 +219,6 @@ function onInputKey(e: KeyboardEvent) {
   background: var(--accent-2);
 }
 .dlg-btn--cancel {
-  background: white;
+  background: var(--color-panel);
 }
 </style>

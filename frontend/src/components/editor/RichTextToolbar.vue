@@ -277,7 +277,7 @@ const disabled = computed(() => !ed.value || !ed.value.isEditable)
       <button type="button" class="tbtn" :disabled="disabled" @click="showColor = !showColor" title="Text color">
         <Icon name="palette" :size="13" />
       </button>
-      <div v-if="showColor" class="absolute z-50 mt-1 bg-white border border-line p-2 shadow" style="min-width:216px">
+      <div v-if="showColor" class="absolute z-50 mt-1 bg-panel border border-line p-2 shadow" style="min-width:216px">
         <div class="grid grid-cols-8 gap-1">
           <button v-for="c in [
             '#000000','#434343','#666666','#999999','#CCCCCC','#D9D9D9','#F3F3F3','#FFFFFF',
@@ -298,7 +298,7 @@ const disabled = computed(() => !ed.value || !ed.value.isEditable)
       <button type="button" class="tbtn" :disabled="disabled" @click="showBgColor = !showBgColor" title="Highlight color">
         <Icon name="highlighter" :size="13" />
       </button>
-      <div v-if="showBgColor" class="absolute z-50 mt-1 bg-white border border-line p-2 shadow" style="min-width:216px">
+      <div v-if="showBgColor" class="absolute z-50 mt-1 bg-panel border border-line p-2 shadow" style="min-width:216px">
         <div class="grid grid-cols-8 gap-1">
           <button v-for="c in [
             '#FFFF00','#fff59d','#FFE082','#FFCC80','#FFAB91','#EF9A9A','#F48FB1','#CE93D8',
@@ -350,7 +350,7 @@ const disabled = computed(() => !ed.value || !ed.value.isEditable)
       <button type="button" class="tbtn" :class="{ 'rte-active': isActive('link') }" :disabled="disabled" @click="openLinkDialog" title="Insert or edit link">
         <Icon name="link" :size="13" />
       </button>
-      <div v-if="showLink" class="absolute z-50 bg-white border border-line p-2 shadow flex gap-2" style="top:100%; left:0; min-width:360px">
+      <div v-if="showLink" class="absolute z-50 bg-panel border border-line p-2 shadow flex gap-2" style="top:100%; left:0; min-width:360px">
         <input
           ref="linkInputRef"
           v-model="linkUrl"
@@ -370,7 +370,7 @@ const disabled = computed(() => !ed.value || !ed.value.isEditable)
       <button type="button" class="tbtn" :disabled="disabled" @click="openImageDialog" title="Insert image">
         <Icon name="image" :size="13" />
       </button>
-      <div v-if="showImage" class="absolute z-50 bg-white border border-line p-2 shadow flex gap-2" style="top:100%; left:0; min-width:380px">
+      <div v-if="showImage" class="absolute z-50 bg-panel border border-line p-2 shadow flex gap-2" style="top:100%; left:0; min-width:380px">
         <input
           ref="imageInputRef"
           v-model="imageUrl"
@@ -389,7 +389,7 @@ const disabled = computed(() => !ed.value || !ed.value.isEditable)
       <button type="button" class="tbtn" :disabled="disabled" @click="showTable = !showTable" title="Insert table">
         <Icon name="table" :size="13" />
       </button>
-      <div v-if="showTable" class="absolute z-50 mt-1 bg-white border border-line p-2 shadow text-[12px]">
+      <div v-if="showTable" class="absolute z-50 mt-1 bg-panel border border-line p-2 shadow text-[12px]">
         <button class="tbtn w-full" @click="insertTable">Insert 3×3 table</button>
         <!-- Future: row/col inputs -->
       </div>
@@ -400,7 +400,7 @@ const disabled = computed(() => !ed.value || !ed.value.isEditable)
       <button type="button" class="tbtn" :disabled="disabled" @click="showEmoji = !showEmoji" title="Insert emoji">
         <Icon name="smile" :size="13" />
       </button>
-      <div v-if="showEmoji" class="absolute z-50 mt-1 bg-white border border-line p-2 shadow grid grid-cols-6 gap-1 text-lg" style="min-width: 220px">
+      <div v-if="showEmoji" class="absolute z-50 mt-1 bg-panel border border-line p-2 shadow grid grid-cols-6 gap-1 text-lg" style="min-width: 220px">
         <button v-for="e in emojiList" :key="e" class="hover:bg-accent-soft p-1" @click="insertEmoji(e)">{{ e }}</button>
       </div>
     </div>

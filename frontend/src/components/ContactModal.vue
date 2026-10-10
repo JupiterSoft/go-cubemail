@@ -107,7 +107,7 @@ async function remove() {
       </div>
 
       <!-- Form -->
-      <div class="bg-white">
+      <div class="bg-panel">
         <!-- Name row -->
         <div class="flex items-center border-b border-line px-3">
           <span class="w-[80px] text-[12px] font-semibold text-ink-sub flex-shrink-0">Name</span>

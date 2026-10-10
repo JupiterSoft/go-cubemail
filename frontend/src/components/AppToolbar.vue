@@ -109,7 +109,7 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
       </button>
       <div
         v-if="moveOpen"
-        class="absolute left-0 top-full mt-0.5 z-50 min-w-[160px] bg-white border border-line shadow-md py-1"
+        class="absolute left-0 top-full mt-0.5 z-50 min-w-[160px] bg-panel border border-line shadow-md py-1"
       >
         <button
           v-for="f in moveFolders"

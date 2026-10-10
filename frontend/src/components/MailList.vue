@@ -35,17 +35,17 @@ function onDragStart(event: DragEvent, message: MailMessage) {
 </script>
 
 <template>
-  <div class="bg-white border-r border-line flex flex-col min-h-0">
+  <div class="bg-panel border-r border-line flex flex-col min-h-0">
     <!-- Header -->
     <div class="h-10 px-3 bg-panel-2 border-b border-line flex items-center justify-between flex-shrink-0">
-      <h2 class="m-0 text-[13px] text-accent-bar font-bold tracking-tight">
+      <h2 class="m-0 text-[13px] text-accent-bar dark:text-ink font-bold tracking-tight">
         {{ mail.currentFolderLabel }}
       </h2>
       <div class="inline-flex items-center gap-1.5 text-[12px] text-ink-sub">
         <span class="text-[11.5px]">Sort by</span>
         <select
           v-model="mail.sortBy"
-          class="bg-white border border-line h-[22px] px-1.5 text-[11.5px] text-ink hover:bg-accent-soft cursor-pointer outline-none"
+          class="bg-panel border border-line h-[22px] px-1.5 text-[11.5px] text-ink hover:bg-accent-soft cursor-pointer outline-none"
         >
           <option value="date">Date</option>
           <option value="from">From</option>
@@ -53,7 +53,7 @@ function onDragStart(event: DragEvent, message: MailMessage) {
           <option value="size">Size</option>
         </select>
         <button
-          class="h-[22px] w-[22px] flex items-center justify-center border border-line bg-white hover:bg-accent-soft text-ink cursor-pointer outline-none"
+          class="h-[22px] w-[22px] flex items-center justify-center border border-line bg-panel hover:bg-accent-soft text-ink cursor-pointer outline-none"
           :title="mail.sortDir === 'asc' ? 'Ascending' : 'Descending'"
           @click="mail.sortDir = mail.sortDir === 'asc' ? 'desc' : 'asc'"
         >

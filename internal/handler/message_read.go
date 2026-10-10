@@ -83,8 +83,6 @@ func (h *MessageHandler) Read(c *echo.Context) error {
 
 		if parsed.TextHTML != "" {
 			safeHTML = template.HTML(bodyPolicy.Sanitize(parsed.TextHTML))
-		} else if parsed.TextPlain != "" {
-			safeHTML = template.HTML("<pre class='whitespace-pre-wrap font-sans text-sm'>" + bodyPolicy.Sanitize(parsed.TextPlain) + "</pre>")
 		}
 	}
 

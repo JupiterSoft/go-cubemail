@@ -99,7 +99,7 @@ async function remove() {
     @click.self="mail.closeEditor()"
   >
     <div class="absolute inset-0 bg-black/40" />
-    <div class="relative bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 z-10 flex flex-col">
+    <div class="relative bg-panel rounded-lg shadow-xl w-full max-w-lg mx-4 z-10 flex flex-col">
       <!-- Header -->
       <div class="flex items-center justify-between px-5 py-3.5 border-b border-line">
         <span class="font-semibold text-ink">{{ title }}</span>

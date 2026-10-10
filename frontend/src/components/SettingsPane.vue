@@ -122,7 +122,7 @@ async function savePrefs() {
 </script>
 
 <template>
-  <div class="bg-white flex flex-col overflow-hidden" style="grid-column:2/4">
+  <div class="bg-panel flex flex-col overflow-hidden" style="grid-column:2/4">
     <!-- Header -->
     <div class="h-10 px-4 bg-panel-2 border-b border-line flex items-center gap-4 flex-shrink-0">
       <span class="font-semibold text-ink text-[13px]">Settings</span>
@@ -311,7 +311,7 @@ async function savePrefs() {
     @click.self="identityOpen = false"
   >
     <div class="absolute inset-0 bg-black/40" />
-    <div class="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-4 z-10">
+    <div class="relative bg-panel rounded-lg shadow-xl w-full max-w-md mx-4 z-10">
       <div class="flex items-center justify-between px-5 py-3.5 border-b border-line">
         <span class="font-semibold text-ink text-[13px]">
           {{ editingId ? 'Edit Identity' : 'New Identity' }}

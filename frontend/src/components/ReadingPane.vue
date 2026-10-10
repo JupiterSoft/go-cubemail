@@ -88,6 +88,30 @@ function formatFullDate(raw) {
 const srcdoc = computed(() => {
   const html = m.value?.htmlBody
   if (!html) return ''
+
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+
+  const designed = Boolean(
+    doc.querySelector(
+      'img, table, svg, video, canvas, [bgcolor], [color], [background], style'
+    )
+  ) || Array.from(doc.querySelectorAll<HTMLElement>('[style]')).some(el => {
+    const css = el.style
+    return Boolean(
+      css.color || css.background || css.backgroundColor || css.backgroundImage
+    )
+  })
+
+  const darkCSS = designed ? '' : `
+    @media (prefers-color-scheme: dark) {
+      html, body {
+        background: #1D2633;
+        color: #E8EDF5;
+      }
+      a { color: #79B6FF; }
+    }
+  `
+
   return `<!DOCTYPE html>
 <html><head>
 <meta charset="utf-8">
@@ -97,13 +121,14 @@ const srcdoc = computed(() => {
   a{color:#2A5599}
   pre{white-space:pre-wrap;word-break:break-all}
   table{border-collapse:collapse}
+  ${darkCSS}
 </style>
 </head><body>${html}</body></html>`
 })
 </script>
 
 <template>
-  <div class="relative bg-white flex flex-col min-h-0">
+  <div class="relative bg-panel flex flex-col min-h-0">
     <!-- Empty state -->
     <div v-if="!m" class="flex-1 flex flex-col items-center justify-center bg-panel-2">
       <div class="es-root">
@@ -117,15 +142,15 @@ const srcdoc = computed(() => {
       <!-- Body loading overlay -->
       <div
         v-if="bodyLoading"
-        class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/80 gap-3"
+        class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-panel/80 gap-3"
       >
         <SpinnerIcon />
         <span class="text-[12px] text-ink-mute tracking-wide">Loading message…</span>
       </div>
 
       <!-- Message header -->
-      <div class="py-3.5 px-4 border-b border-line bg-white flex-shrink-0">
-        <h1 class="m-0 mb-2.5 text-[17px] text-accent-bar font-bold tracking-tight leading-snug">
+      <div class="py-3.5 px-4 border-b border-line bg-panel flex-shrink-0">
+        <h1 class="m-0 mb-2.5 text-[17px] text-ink font-bold tracking-tight leading-snug">
           {{ m.subject }}
         </h1>
         <div class="flex items-start gap-3">
@@ -136,7 +161,7 @@ const srcdoc = computed(() => {
           <!-- From / To -->
           <div class="flex-1 min-w-0 text-[13px] leading-snug">
             <div>
-              <b class="text-[#0E1A2E]">{{ m.from?.name }}</b>
+              <b class="text-ink">{{ m.from?.name }}</b>
               <span class="text-ink-mute text-[12px] ml-1">&lt;{{ m.from?.addr }}&gt;</span>
             </div>
             <div class="text-[12px] text-ink-sub mt-0.5">
@@ -175,7 +200,7 @@ const srcdoc = computed(() => {
       <!-- Calendar invitation bar -->
       <div
         v-if="m.isCalendarRequest && m.calendarInfo"
-        class="flex-shrink-0 border-b border-line bg-[#f4f7fc]"
+        class="flex-shrink-0 border-b border-line bg-panel-2"
       >
         <!-- Event summary row -->
         <div class="px-4 pt-3 pb-2 flex flex-wrap gap-x-5 gap-y-0.5 text-[12.5px] text-ink">
@@ -197,12 +222,12 @@ const srcdoc = computed(() => {
           <template v-if="m.calendarInfo.method !== 'CANCEL'">
             <button class="px-3 py-1 text-[12px] font-semibold bg-[#1B3A6B] text-white hover:bg-[#14305a] transition-colors" type="button" @click="mail.calendarRsvp('ACCEPTED')">ACCEPT</button>
             <button class="px-3 py-1 text-[12px] font-semibold bg-[#e05a2b] text-white hover:bg-[#c44d22] transition-colors" type="button" @click="mail.calendarRsvp('DECLINED')">DECLINE</button>
-            <button class="px-3 py-1 text-[12px] font-semibold border border-[#bbb] bg-white text-ink hover:bg-panel-2 transition-colors" type="button" @click="mail.calendarRsvp('TENTATIVE')">TENTATIVE</button>
-            <button class="px-3 py-1 text-[12px] font-semibold border border-[#bbb] bg-white text-ink hover:bg-panel-2 transition-colors" type="button" @click="mail.calendarDelegate()">DELEGATE ...</button>
-            <button class="px-3 py-1 text-[12px] font-semibold border border-[#bbb] bg-white text-ink hover:bg-panel-2 transition-colors" type="button" @click="mail.calendarAddToCalendar()">ADD TO CALENDAR</button>
+            <button class="px-3 py-1 text-[12px] font-semibold border border-[#bbb] bg-panel text-ink hover:bg-panel-2 transition-colors" type="button" @click="mail.calendarRsvp('TENTATIVE')">TENTATIVE</button>
+            <button class="px-3 py-1 text-[12px] font-semibold border border-[#bbb] bg-panel text-ink hover:bg-panel-2 transition-colors" type="button" @click="mail.calendarDelegate()">DELEGATE ...</button>
+            <button class="px-3 py-1 text-[12px] font-semibold border border-[#bbb] bg-panel text-ink hover:bg-panel-2 transition-colors" type="button" @click="mail.calendarAddToCalendar()">ADD TO CALENDAR</button>
           </template>
           <template v-else>
-            <button class="px-3 py-1 text-[12px] font-semibold border border-[#bbb] bg-white text-ink hover:bg-panel-2 transition-colors" type="button" @click="mail.calendarAddToCalendar()">REMOVE FROM CALENDAR</button>
+            <button class="px-3 py-1 text-[12px] font-semibold border border-[#bbb] bg-panel text-ink hover:bg-panel-2 transition-colors" type="button" @click="mail.calendarAddToCalendar()">REMOVE FROM CALENDAR</button>
           </template>
         </div>
       </div>
@@ -221,7 +246,7 @@ const srcdoc = computed(() => {
           :key="i"
           :href="`/webmail/api/v1/mail/${m.folder}/${m.id}/attachment/${a.part ?? i}`"
           target="_blank"
-          class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-white border border-line text-[11px] text-ink no-underline hover:border-accent-2 hover:bg-accent-soft"
+          class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-panel border border-line text-[11px] text-ink no-underline hover:border-accent-2 hover:bg-accent-soft"
         >
           <Icon :name="extIcon(a.ext)" :size="11" :class="extColor(a.ext)" />
           <span class="font-medium max-w-[110px] overflow-hidden text-ellipsis whitespace-nowrap">{{ a.name }}</span>

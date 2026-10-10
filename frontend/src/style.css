@@ -553,3 +553,139 @@ button, input, select, textarea { font-family: inherit; border-radius: 0; }
   font-weight: 700;
   text-shadow: 0 1px 2px rgba(0,0,0,.5);
 }
+
+/* Automatic dark mode based on operating system preferences */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    /* Main surfaces */
+    --color-app-bg: #141B26;
+    --color-panel: #1D2633;
+    --color-panel-2: #263241;
+
+    /* Borders */
+    --color-line: #405064;
+    --color-line-soft: #303D4F;
+
+    /* Text */
+    --color-ink: #E8EDF5;
+    --color-ink-sub: #B3C0D0;
+    --color-ink-mute: #8999AC;
+
+    /* Accent */
+    --accent: #315F9F;
+    --accent-2: #79B6FF;
+    --accent-bar: #1B3B69;
+    --accent-soft: #293D56;
+    --accent-soft-2: #344B69;
+    --row-selected: #304764;
+
+    /* Status */
+    --color-star: #F1BF4D;
+    --color-danger: #FF8585;
+    --color-success: #65CC94;
+  }
+
+  /* Toolbar */
+  .tbtn:not(.tbtn-primary) {
+    background: var(--color-panel);
+    color: var(--color-ink);
+  }
+
+  /* Sidebar */
+  .side-item:hover {
+    background: var(--color-panel-2);
+  }
+
+  .side-item.active,
+  .side-item.active .count {
+    color: var(--color-ink);
+  }
+
+  /* Messages */
+  .mail-row:hover {
+    background: var(--color-panel-2);
+  }
+
+  .mail-row.unread .from,
+  .mail-row.unread .subject {
+    color: var(--color-ink);
+  }
+
+  /* Controls */
+  .checkbox,
+  .kebab-menu {
+    background: var(--color-panel);
+  }
+}
+
+/* Dark mode: selected folders and messages */
+@media (prefers-color-scheme: dark) {
+  .side-item.active,
+  .mail-row.selected {
+    background: #304764 !important;
+    color: #E8EDF5 !important;
+  }
+
+  .side-item.active .lbl,
+  .side-item.active .count,
+  .mail-row.selected .from,
+  .mail-row.selected .subject {
+    color: #F2F6FC !important;
+  }
+
+  .mail-row.selected .date,
+  .mail-row.selected .preview {
+    color: #B9C9DB !important;
+  }
+
+  .side-item.active {
+    border-left-color: #79B6FF !important;
+  }
+
+  .mail-row.selected {
+    outline-color: #79B6FF !important;
+  }
+}
+
+/* Dark mode: compose window and address fields */
+@media (prefers-color-scheme: dark) {
+  .composer-shell {
+    background: var(--color-panel);
+    color: var(--color-ink);
+  }
+
+  .composer-shell .composer-field input,
+  .composer-shell .composer-field textarea,
+  .composer-shell .composer-field select {
+    background-color: var(--color-panel);
+    color: var(--color-ink);
+    caret-color: var(--color-ink);
+  }
+
+  .composer-shell .composer-field input::placeholder,
+  .composer-shell .composer-field textarea::placeholder {
+    color: var(--color-ink-mute);
+    opacity: 1;
+  }
+}
+
+/* Dark mode: message composer body */
+@media (prefers-color-scheme: dark) {
+  .composer-shell .rte-content,
+  .composer-shell .rte-content .ProseMirror {
+    background: var(--color-panel);
+    color: var(--color-ink);
+    caret-color: var(--color-ink);
+  }
+
+  .composer-shell .rte-content textarea {
+    background: var(--color-panel);
+    color: var(--color-ink);
+  }
+
+  .composer-shell .rte-content blockquote {
+    color: var(--color-ink-sub);
+  }
+}

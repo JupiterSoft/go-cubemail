@@ -183,7 +183,7 @@ watch(() => mail.view, async (v) => {
 </script>
 
 <template>
-  <div class="bg-white overflow-hidden flex flex-col">
+  <div class="bg-panel overflow-hidden flex flex-col">
     <!-- Toolbar -->
     <div class="h-10 px-4 bg-panel-2 border-b border-line flex items-center gap-1.5 flex-shrink-0">
       <button class="tbtn" type="button" @click="mail.navigatePrev()">

@@ -102,13 +102,13 @@ const quotaPercent    = computed(() => {
 </script>
 
 <template>
-  <aside class="bg-white border-r border-line flex flex-col min-h-0">
+  <aside class="bg-panel border-r border-line flex flex-col min-h-0">
     <!-- Header -->
     <div class="h-10 px-3 flex items-center justify-between bg-panel-2 border-b border-line flex-shrink-0">
       <span class="text-[11px] uppercase tracking-wider text-ink-sub font-bold">Folders</span>
       <button
         type="button"
-        class="bg-white border border-line h-[22px] px-2 text-[11.5px] text-ink hover:bg-accent-soft inline-flex items-center gap-1"
+        class="bg-panel border border-line h-[22px] px-2 text-[11.5px] text-ink hover:bg-accent-soft inline-flex items-center gap-1"
         @click="mail.onFolderMenu('new', null)"
       >
         <Icon name="folder-plus" :size="12" /> New Folder
