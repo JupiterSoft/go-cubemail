@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/labstack/echo/v5"
 	"go-cubemail/internal/config"
 	"go-cubemail/internal/imap"
 	"go-cubemail/internal/session"
-	"github.com/labstack/echo/v5"
 )
 
 // AuthHandler handles user authentication: login, logout, session introspection, and IMAP quota.
@@ -33,7 +33,7 @@ type AuthHandler struct {
 // @Failure      500  {object}  map[string]string "Session error"
 // @Router       /auth/login [post]
 func (h *AuthHandler) DoLogin(c *echo.Context) error {
-	imapHost := c.FormValue("imap_host")
+	imapHost := h.cfg.IMAP.Host
 	username := strings.TrimSpace(c.FormValue("username"))
 	password := c.FormValue("password")
 
@@ -45,8 +45,11 @@ func (h *AuthHandler) DoLogin(c *echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Input too long."})
 	}
 
-	if imapHost == "" {
-		imapHost = h.cfg.IMAP.Host
+	if strings.Count(username, "@") != 1 ||
+		!strings.HasSuffix(strings.ToLower(username), "@jupitersoft.kz") {
+		return c.JSON(http.StatusForbidden, map[string]string{
+			"error": "Only @jupitersoft.kz mailboxes are allowed.",
+		})
 	}
 
 	conn, err := imap.Connect(
